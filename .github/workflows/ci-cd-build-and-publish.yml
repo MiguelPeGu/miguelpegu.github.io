@@ -78,8 +78,8 @@ jobs:
             fi
           fi
 
-      - name: Commit and push changes to main (if any)
-        uses: stefanzweifel/git-auto-commit-action@v4
+#      - name: Commit and push changes to main (if any)
+ #       uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "ci: update site with build info ${{ env.BUILD_TS }} (${{ env.BUILD_SHA }})"
           file_pattern: "index.html"
