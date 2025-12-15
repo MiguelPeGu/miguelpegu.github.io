@@ -38,7 +38,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./Dockerfile            # <- ajusta la ruta al Dockerfile del proyecto
+          file: ./Dockerfile
           push: true
           tags: |
             ${{ env.IMAGE_NAME }}:latest
@@ -89,6 +89,6 @@ $ESCAPED_BLOCK\\
         with:
           commit_message: "ci: update site with build info ${{ env.BUILD_TS }} (${{ env.BUILD_SHA }})"
           file_pattern: "index.html"
-          branch: main
-          author_name: github-actions[bot]
-          author_email: 41898282+github-actions[bot]@users.noreply.github.com
+          branch: "main"
+          author_name: "github-actions[bot]"
+          author_email: "41898282+github-actions[bot]@users.noreply.github.com"
