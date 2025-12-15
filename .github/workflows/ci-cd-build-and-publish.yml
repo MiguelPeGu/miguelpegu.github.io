@@ -13,13 +13,16 @@ permissions:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: ghcr.io/${{ github.repository_owner | lower }}/miguelpegu.github.io
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           persist-credentials: true
+
+      - name: Set IMAGE_NAME lowercase
+        run: |
+          IMAGE_NAME="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/miguelpegu.github.io"
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
       - name: Set up QEMU (optional for multi-arch)
         uses: docker/setup-qemu-action@v2
