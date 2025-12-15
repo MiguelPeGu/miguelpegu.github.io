@@ -44,7 +44,7 @@ jobs:
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-      - name: Create build-info (timestamp + sha)
+      - name: Create build info (timestamp + SHA)
         id: buildinfo
         run: |
           echo "BUILD_TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
@@ -65,23 +65,17 @@ jobs:
           # Bloque de build info
           BUILD_BLOCK="Build: $BUILD_TS - SHA: $BUILD_SHA - Image: $BUILD_TAG"
 
-          # Escapar caracteres especiales para sed
-          ESCAPED_BLOCK=$(printf '%s\n' "$BUILD_BLOCK" | sed -e 's/[\/&]/\\&/g')
-
-          # Si existe la marca, reemplazar el bloque
+          # Eliminar bloque de build info anterior si existe
           if grep -q "<!-- BUILD_INFO -->" "$SITE_INDEX"; then
-            sed -i "/<!-- BUILD_INFO -->/,/<!-- END_BUILD_INFO -->/c\\
-<!-- BUILD_INFO -->\\
-$ESCAPED_BLOCK\\
-<!-- END_BUILD_INFO -->" "$SITE_INDEX"
+            sed "/<!-- BUILD_INFO -->/,/<!-- END_BUILD_INFO -->/d" "$SITE_INDEX" > "$SITE_INDEX.tmp"
+            mv "$SITE_INDEX.tmp" "$SITE_INDEX"
+          fi
+
+          # Insertar el bloque antes de </body> si existe, si no, al final
+          if grep -q "</body>" "$SITE_INDEX"; then
+            sed -i "/<\/body>/i <!-- BUILD_INFO -->\n$BUILD_BLOCK\n<!-- END_BUILD_INFO -->" "$SITE_INDEX"
           else
-            # Si no existe, insertar antes del cierre de body
-            if grep -q "</body>" "$SITE_INDEX"; then
-              sed -i "/<\/body>/i <!-- BUILD_INFO -->\n$ESCAPED_BLOCK\n<!-- END_BUILD_INFO -->" "$SITE_INDEX"
-            else
-              # Si no hay </body>, añadir al final
-              echo -e "\n<!-- BUILD_INFO -->\n$BUILD_BLOCK\n<!-- END_BUILD_INFO -->" >> "$SITE_INDEX"
-            fi
+            echo -e "\n<!-- BUILD_INFO -->\n$BUILD_BLOCK\n<!-- END_BUILD_INFO -->" >> "$SITE_INDEX"
           fi
 
       - name: Commit and push changes to main (if any)
